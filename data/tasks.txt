@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Hello",
+        "status": "Todo"
+    },
+    {
+        "name": "World",
+        "status": "Todo"
+    },
+    {
+        "name": "Lorem Ipsum Dolor",
+        "status": "Done"
+    },
+    {
+        "name": "Fold the dishes",
+        "status": "InProgress"
+    },
+    {
+        "name": "Eat dinner",
+        "status": "InProgress"
+    },
+    {
+        "name": "Hello Juneau",
+        "status": "Todo"
+    }
+]

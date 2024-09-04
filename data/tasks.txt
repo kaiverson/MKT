@@ -1,26 +1,34 @@
 [
     {
-        "name": "Hello",
+        "name": "Hi Mom",
         "status": "Todo"
     },
     {
-        "name": "World",
+        "name": "Lorem",
         "status": "Todo"
     },
     {
-        "name": "Lorem Ipsum Dolor",
-        "status": "Done"
+        "name": "Ipsum",
+        "status": "Todo"
     },
     {
-        "name": "Fold the dishes",
-        "status": "InProgress"
+        "name": "Hello Mom",
+        "status": "Todo"
     },
     {
-        "name": "Eat dinner",
-        "status": "InProgress"
+        "name": "eat the dishes",
+        "status": "Todo"
     },
     {
-        "name": "Hello Juneau",
+        "name": "wash the food",
+        "status": "Todo"
+    },
+    {
+        "name": "rip the clothes",
+        "status": "Todo"
+    },
+    {
+        "name": "Split the atoms",
         "status": "Todo"
     }
 ]

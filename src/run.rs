@@ -11,6 +11,7 @@ pub fn run(config: Config) -> Result<(), String> {
     // let task = config.task.as_ref().unwrap();
 
     match config.mode {
+        Mode::Message(message) => println!("{}", message),
         Mode::Create => create(config)?,
         Mode::Read => read(config)?,
         // Mode::Update => update(config)?,
@@ -148,14 +149,11 @@ fn read(config: Config) -> Result<(), String> {
 
     if let Ok(i) = task_index {
         println!("{:#?}", all_tasks[i]);
-        return Ok(());
-    }
-
-    if let Err(i) = task_index {
-        println!("task `{}` not found.\n0 changes made.", task.name);
+    } else if let Err(i) = task_index {
+        println!("Task `{}` not found.", task.name);
 
         if i >= 0 {
-            println!("\n\ntry `{}`?", all_tasks[i as usize].name)
+            println!("Try `{}`?", all_tasks[i as usize].name);
         }
     }
 
@@ -164,31 +162,29 @@ fn read(config: Config) -> Result<(), String> {
 
 fn delete(config: Config) -> Result<(), String> {
     let database_path = config.database_path;
-    let mut all_tasks = parse_tasks(database_path.clone());
+    let all_tasks = deserialize_tasks(parse_tasks(database_path.clone()));
     let task = config.task.expect("`config` should contain `task`");
+    let task_index = match_or_suggest_task(all_tasks.clone(), task.clone(), 3);
 
-    let mut contains_task: bool = false;
-    for (i, t) in all_tasks.clone().members().enumerate() {
-        println!("{}", t);
-        if task.name[..] != t["name"] {
-            continue;
+    if let Ok(i) = task_index {
+        let mut all_tasks = parse_tasks(database_path.clone());
+        all_tasks.array_remove(i);
+
+        println!("task `{}` removed.", task.name);
+
+        let all_tasks = json::stringify_pretty(all_tasks, 4);
+        return clear_and_write_database(database_path, all_tasks);
+    } else if let Err(i) = task_index {
+        println!("Task `{}` not found.", task.name);
+
+        if i >= 0 {
+            println!("Try `{}`?", all_tasks[i as usize].name);
         }
 
-        contains_task = true;
-        all_tasks.array_remove(i);
-        break;
+        println!("\n0 changes made.");
     }
 
-    if !contains_task {
-        println!("task `{}` doesn't exist.\n0 changes made.", task.name);
-        return Ok(());
-    }
-
-    println!("task `{}` removed.", task.name);
-
-    let all_tasks = json::stringify_pretty(all_tasks, 4);
-
-    clear_and_write_database(database_path, all_tasks)
+    Ok(())
 }
 
 fn list(config: Config) -> Result<(), String> {
@@ -220,4 +216,33 @@ fn list(config: Config) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clear_and_write_database() {
+        assert!(clear_and_write_database(
+            "data/test.txt".to_string(),
+            "Hello from the tests".to_string(),
+        )
+        .is_ok());
+
+        assert_eq!(
+            std::fs::read_to_string("data/test.txt").unwrap(),
+            "Hello from the tests\n".to_string()
+        );
+
+        assert!(clear_and_write_database("data/test.txt".to_string(), "".to_string(),).is_ok());
+
+        assert_eq!(
+            std::fs::read_to_string("data/test.txt").unwrap(),
+            "\n".to_string()
+        );
+    }
+
+    #[test]
+    fn test_parse_task() {}
 }
